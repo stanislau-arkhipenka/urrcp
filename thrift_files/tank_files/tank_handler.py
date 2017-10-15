@@ -1,13 +1,7 @@
 #!/usr/bin/env python
 
-#import glob
-import sys
-sys.path.append('gen-py')
-#sys.path.insert(0, glob.glob('../../lib/py/build/lib*')[0])
-
-
-from tank import tank
-
+from urrcp.settings import SERVER_ADDR
+from urrcp.urrcp_ready.tank import Tank
 
 from thrift.transport import TSocket
 from thrift.transport import TTransport
@@ -28,18 +22,13 @@ class CalculatorHandler:
 
 if __name__ == '__main__':
     handler = CalculatorHandler()
-    processor = tank.Processor(handler)
-    transport = TSocket.TServerSocket(host='127.0.0.1', port=9090)
+    processor = Tank.Processor(handler)
+    transport = TSocket.TServerSocket(host=SERVER_ADDR, port=9090)
     tfactory = TTransport.TBufferedTransportFactory()
     pfactory = TBinaryProtocol.TBinaryProtocolFactory()
 
     server = TServer.TSimpleServer(processor, transport, tfactory, pfactory)
 
-    # You could do one of these for a multithreaded server
-    # server = TServer.TThreadedServer(
-    #     processor, transport, tfactory, pfactory)
-    # server = TServer.TThreadPoolServer(
-    #     processor, transport, tfactory, pfactory)
 
     print('Starting the server...')
     server.serve()
