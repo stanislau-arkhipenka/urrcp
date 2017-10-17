@@ -1,5 +1,5 @@
 
-service Tank{
+service Urrcp{
 
     # test if robot is available
     void ping(),

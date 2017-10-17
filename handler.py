@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from urrcp.settings import SERVER_ADDR
-from urrcp.urrcp_ready.tank import Tank
+from urrcp import Urrcp
 
 from thrift.transport import TSocket
 from thrift.transport import TTransport
@@ -9,7 +9,7 @@ from thrift.protocol import TBinaryProtocol
 from thrift.server import TServer
 
 
-class CalculatorHandler:
+class UrrcpHandler:
     def __init__(self):
         self.log = {}
 
@@ -21,8 +21,8 @@ class CalculatorHandler:
 
 
 if __name__ == '__main__':
-    handler = CalculatorHandler()
-    processor = Tank.Processor(handler)
+    handler = UrrcpHandler()
+    processor = Urrcp.Processor(handler)
     transport = TSocket.TServerSocket(host=SERVER_ADDR, port=9090)
     tfactory = TTransport.TBufferedTransportFactory()
     pfactory = TBinaryProtocol.TBinaryProtocolFactory()
