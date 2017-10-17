@@ -22,6 +22,5 @@ thrift --gen py urrcp.thrift
 
 echo "copy files"
 cp ${root_path}/thrift_files/gen-py/urrcp/* ${root_path}/
-cp ${root_path}/handler.py ${root_path}/ready/
 
 echo "done."
