@@ -1,4 +1,4 @@
-from init_schema import INIT_SCHEMA
+from robots.tank.init_schema import INIT_SCHEMA
 
 
 class RobotMeta:

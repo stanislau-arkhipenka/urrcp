@@ -32,7 +32,7 @@ class Iface:
     """
     pass
 
-  def set_device_position(self, device_id, value):
+  def set_device_double_value(self, device_id, value):
     """
     Parameters:
      - device_id
@@ -40,19 +40,17 @@ class Iface:
     """
     pass
 
-  def set_device_speed(self, device_id, value):
+  def get_sensor_double_value(self, sensor_id):
     """
     Parameters:
-     - device_id
-     - value
+     - sensor_id
     """
     pass
 
-  def set_device_acceleration(self, device_id, value):
+  def get_sensor_string_value(self, sensor_id):
     """
     Parameters:
-     - device_id
-     - value
+     - sensor_id
     """
     pass
 
@@ -130,54 +128,82 @@ class Client(Iface):
     args.write(self._oprot)
     self._oprot.writeMessageEnd()
     self._oprot.trans.flush()
-  def set_device_position(self, device_id, value):
+  def set_device_double_value(self, device_id, value):
     """
     Parameters:
      - device_id
      - value
     """
-    self.send_set_device_position(device_id, value)
+    self.send_set_device_double_value(device_id, value)
 
-  def send_set_device_position(self, device_id, value):
-    self._oprot.writeMessageBegin('set_device_position', TMessageType.CALL, self._seqid)
-    args = set_device_position_args()
+  def send_set_device_double_value(self, device_id, value):
+    self._oprot.writeMessageBegin('set_device_double_value', TMessageType.CALL, self._seqid)
+    args = set_device_double_value_args()
     args.device_id = device_id
     args.value = value
     args.write(self._oprot)
     self._oprot.writeMessageEnd()
     self._oprot.trans.flush()
-  def set_device_speed(self, device_id, value):
+  def get_sensor_double_value(self, sensor_id):
     """
     Parameters:
-     - device_id
-     - value
+     - sensor_id
     """
-    self.send_set_device_speed(device_id, value)
+    self.send_get_sensor_double_value(sensor_id)
+    return self.recv_get_sensor_double_value()
 
-  def send_set_device_speed(self, device_id, value):
-    self._oprot.writeMessageBegin('set_device_speed', TMessageType.CALL, self._seqid)
-    args = set_device_speed_args()
-    args.device_id = device_id
-    args.value = value
+  def send_get_sensor_double_value(self, sensor_id):
+    self._oprot.writeMessageBegin('get_sensor_double_value', TMessageType.CALL, self._seqid)
+    args = get_sensor_double_value_args()
+    args.sensor_id = sensor_id
     args.write(self._oprot)
     self._oprot.writeMessageEnd()
     self._oprot.trans.flush()
-  def set_device_acceleration(self, device_id, value):
+
+  def recv_get_sensor_double_value(self):
+    (fname, mtype, rseqid) = self._iprot.readMessageBegin()
+    if mtype == TMessageType.EXCEPTION:
+      x = TApplicationException()
+      x.read(self._iprot)
+      self._iprot.readMessageEnd()
+      raise x
+    result = get_sensor_double_value_result()
+    result.read(self._iprot)
+    self._iprot.readMessageEnd()
+    if result.success is not None:
+      return result.success
+    raise TApplicationException(TApplicationException.MISSING_RESULT, "get_sensor_double_value failed: unknown result");
+
+  def get_sensor_string_value(self, sensor_id):
     """
     Parameters:
-     - device_id
-     - value
+     - sensor_id
     """
-    self.send_set_device_acceleration(device_id, value)
+    self.send_get_sensor_string_value(sensor_id)
+    return self.recv_get_sensor_string_value()
 
-  def send_set_device_acceleration(self, device_id, value):
-    self._oprot.writeMessageBegin('set_device_acceleration', TMessageType.CALL, self._seqid)
-    args = set_device_acceleration_args()
-    args.device_id = device_id
-    args.value = value
+  def send_get_sensor_string_value(self, sensor_id):
+    self._oprot.writeMessageBegin('get_sensor_string_value', TMessageType.CALL, self._seqid)
+    args = get_sensor_string_value_args()
+    args.sensor_id = sensor_id
     args.write(self._oprot)
     self._oprot.writeMessageEnd()
     self._oprot.trans.flush()
+
+  def recv_get_sensor_string_value(self):
+    (fname, mtype, rseqid) = self._iprot.readMessageBegin()
+    if mtype == TMessageType.EXCEPTION:
+      x = TApplicationException()
+      x.read(self._iprot)
+      self._iprot.readMessageEnd()
+      raise x
+    result = get_sensor_string_value_result()
+    result.read(self._iprot)
+    self._iprot.readMessageEnd()
+    if result.success is not None:
+      return result.success
+    raise TApplicationException(TApplicationException.MISSING_RESULT, "get_sensor_string_value failed: unknown result");
+
 
 class Processor(Iface, TProcessor):
   def __init__(self, handler):
@@ -186,9 +212,9 @@ class Processor(Iface, TProcessor):
     self._processMap["ping"] = Processor.process_ping
     self._processMap["get_init_schema"] = Processor.process_get_init_schema
     self._processMap["set_config"] = Processor.process_set_config
-    self._processMap["set_device_position"] = Processor.process_set_device_position
-    self._processMap["set_device_speed"] = Processor.process_set_device_speed
-    self._processMap["set_device_acceleration"] = Processor.process_set_device_acceleration
+    self._processMap["set_device_double_value"] = Processor.process_set_device_double_value
+    self._processMap["get_sensor_double_value"] = Processor.process_get_sensor_double_value
+    self._processMap["get_sensor_string_value"] = Processor.process_get_sensor_string_value
 
   def process(self, iprot, oprot):
     (name, type, seqid) = iprot.readMessageBegin()
@@ -234,26 +260,34 @@ class Processor(Iface, TProcessor):
     self._handler.set_config(args.config_name, args.config_value)
     return
 
-  def process_set_device_position(self, seqid, iprot, oprot):
-    args = set_device_position_args()
+  def process_set_device_double_value(self, seqid, iprot, oprot):
+    args = set_device_double_value_args()
     args.read(iprot)
     iprot.readMessageEnd()
-    self._handler.set_device_position(args.device_id, args.value)
+    self._handler.set_device_double_value(args.device_id, args.value)
     return
 
-  def process_set_device_speed(self, seqid, iprot, oprot):
-    args = set_device_speed_args()
+  def process_get_sensor_double_value(self, seqid, iprot, oprot):
+    args = get_sensor_double_value_args()
     args.read(iprot)
     iprot.readMessageEnd()
-    self._handler.set_device_speed(args.device_id, args.value)
-    return
+    result = get_sensor_double_value_result()
+    result.success = self._handler.get_sensor_double_value(args.sensor_id)
+    oprot.writeMessageBegin("get_sensor_double_value", TMessageType.REPLY, seqid)
+    result.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
 
-  def process_set_device_acceleration(self, seqid, iprot, oprot):
-    args = set_device_acceleration_args()
+  def process_get_sensor_string_value(self, seqid, iprot, oprot):
+    args = get_sensor_string_value_args()
     args.read(iprot)
     iprot.readMessageEnd()
-    self._handler.set_device_acceleration(args.device_id, args.value)
-    return
+    result = get_sensor_string_value_result()
+    result.success = self._handler.get_sensor_string_value(args.sensor_id)
+    oprot.writeMessageBegin("get_sensor_string_value", TMessageType.REPLY, seqid)
+    result.write(oprot)
+    oprot.writeMessageEnd()
+    oprot.trans.flush()
 
 
 # HELPER FUNCTIONS AND STRUCTURES
@@ -532,7 +566,7 @@ class set_config_args:
   def __ne__(self, other):
     return not (self == other)
 
-class set_device_position_args:
+class set_device_double_value_args:
   """
   Attributes:
    - device_id
@@ -577,7 +611,7 @@ class set_device_position_args:
     if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
-    oprot.writeStructBegin('set_device_position_args')
+    oprot.writeStructBegin('set_device_double_value_args')
     if self.device_id is not None:
       oprot.writeFieldBegin('device_id', TType.STRING, 1)
       oprot.writeString(self.device_id)
@@ -604,22 +638,19 @@ class set_device_position_args:
   def __ne__(self, other):
     return not (self == other)
 
-class set_device_speed_args:
+class get_sensor_double_value_args:
   """
   Attributes:
-   - device_id
-   - value
+   - sensor_id
   """
 
   thrift_spec = (
     None, # 0
-    (1, TType.STRING, 'device_id', None, None, ), # 1
-    (2, TType.DOUBLE, 'value', None, None, ), # 2
+    (1, TType.STRING, 'sensor_id', None, None, ), # 1
   )
 
-  def __init__(self, device_id=None, value=None,):
-    self.device_id = device_id
-    self.value = value
+  def __init__(self, sensor_id=None,):
+    self.sensor_id = sensor_id
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -632,12 +663,7 @@ class set_device_speed_args:
         break
       if fid == 1:
         if ftype == TType.STRING:
-          self.device_id = iprot.readString();
-        else:
-          iprot.skip(ftype)
-      elif fid == 2:
-        if ftype == TType.DOUBLE:
-          self.value = iprot.readDouble();
+          self.sensor_id = iprot.readString();
         else:
           iprot.skip(ftype)
       else:
@@ -649,14 +675,10 @@ class set_device_speed_args:
     if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
-    oprot.writeStructBegin('set_device_speed_args')
-    if self.device_id is not None:
-      oprot.writeFieldBegin('device_id', TType.STRING, 1)
-      oprot.writeString(self.device_id)
-      oprot.writeFieldEnd()
-    if self.value is not None:
-      oprot.writeFieldBegin('value', TType.DOUBLE, 2)
-      oprot.writeDouble(self.value)
+    oprot.writeStructBegin('get_sensor_double_value_args')
+    if self.sensor_id is not None:
+      oprot.writeFieldBegin('sensor_id', TType.STRING, 1)
+      oprot.writeString(self.sensor_id)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -676,22 +698,78 @@ class set_device_speed_args:
   def __ne__(self, other):
     return not (self == other)
 
-class set_device_acceleration_args:
+class get_sensor_double_value_result:
   """
   Attributes:
-   - device_id
-   - value
+   - success
+  """
+
+  thrift_spec = (
+    (0, TType.DOUBLE, 'success', None, None, ), # 0
+  )
+
+  def __init__(self, success=None,):
+    self.success = success
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 0:
+        if ftype == TType.DOUBLE:
+          self.success = iprot.readDouble();
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('get_sensor_double_value_result')
+    if self.success is not None:
+      oprot.writeFieldBegin('success', TType.DOUBLE, 0)
+      oprot.writeDouble(self.success)
+      oprot.writeFieldEnd()
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class get_sensor_string_value_args:
+  """
+  Attributes:
+   - sensor_id
   """
 
   thrift_spec = (
     None, # 0
-    (1, TType.STRING, 'device_id', None, None, ), # 1
-    (2, TType.DOUBLE, 'value', None, None, ), # 2
+    (1, TType.STRING, 'sensor_id', None, None, ), # 1
   )
 
-  def __init__(self, device_id=None, value=None,):
-    self.device_id = device_id
-    self.value = value
+  def __init__(self, sensor_id=None,):
+    self.sensor_id = sensor_id
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -704,12 +782,7 @@ class set_device_acceleration_args:
         break
       if fid == 1:
         if ftype == TType.STRING:
-          self.device_id = iprot.readString();
-        else:
-          iprot.skip(ftype)
-      elif fid == 2:
-        if ftype == TType.DOUBLE:
-          self.value = iprot.readDouble();
+          self.sensor_id = iprot.readString();
         else:
           iprot.skip(ftype)
       else:
@@ -721,14 +794,69 @@ class set_device_acceleration_args:
     if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
-    oprot.writeStructBegin('set_device_acceleration_args')
-    if self.device_id is not None:
-      oprot.writeFieldBegin('device_id', TType.STRING, 1)
-      oprot.writeString(self.device_id)
+    oprot.writeStructBegin('get_sensor_string_value_args')
+    if self.sensor_id is not None:
+      oprot.writeFieldBegin('sensor_id', TType.STRING, 1)
+      oprot.writeString(self.sensor_id)
       oprot.writeFieldEnd()
-    if self.value is not None:
-      oprot.writeFieldBegin('value', TType.DOUBLE, 2)
-      oprot.writeDouble(self.value)
+    oprot.writeFieldStop()
+    oprot.writeStructEnd()
+
+  def validate(self):
+    return
+
+
+  def __repr__(self):
+    L = ['%s=%r' % (key, value)
+      for key, value in self.__dict__.iteritems()]
+    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+  def __eq__(self, other):
+    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not (self == other)
+
+class get_sensor_string_value_result:
+  """
+  Attributes:
+   - success
+  """
+
+  thrift_spec = (
+    (0, TType.STRING, 'success', None, None, ), # 0
+  )
+
+  def __init__(self, success=None,):
+    self.success = success
+
+  def read(self, iprot):
+    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
+      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
+      return
+    iprot.readStructBegin()
+    while True:
+      (fname, ftype, fid) = iprot.readFieldBegin()
+      if ftype == TType.STOP:
+        break
+      if fid == 0:
+        if ftype == TType.STRING:
+          self.success = iprot.readString();
+        else:
+          iprot.skip(ftype)
+      else:
+        iprot.skip(ftype)
+      iprot.readFieldEnd()
+    iprot.readStructEnd()
+
+  def write(self, oprot):
+    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
+      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
+      return
+    oprot.writeStructBegin('get_sensor_string_value_result')
+    if self.success is not None:
+      oprot.writeFieldBegin('success', TType.STRING, 0)
+      oprot.writeString(self.success)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()

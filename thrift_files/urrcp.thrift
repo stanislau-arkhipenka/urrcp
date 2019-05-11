@@ -33,14 +33,13 @@ service Urrcp{
     # Set config
     oneway void set_config(1:string config_name, 2:string config_value),
 
-    # Control by position
-    oneway void set_device_position(1:string device_id, 2:double value),
+    # Physical device control
+    oneway void set_device_double_value(1:string device_id, 2:double value),
 
-    # Control by speed
-    oneway void set_device_speed(1:string device_id, 2:double value),
+    # Get double information from sensors
+    double get_sensor_double_value(1:string sensor_id),
 
-    # Control by acceleration
-    oneway void set_device_acceleration(1:string device_id, 2:double value),
-
+    # Get string information from sensors
+    string get_sensor_string_value(1:string sensor_id)
 
 }
