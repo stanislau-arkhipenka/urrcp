@@ -1,9 +1,14 @@
+import logging
 from __future__ import division
 import Adafruit_PCA9685
 from device_handlers.meta_driver import MetaDriver
 
+logger = logging.getLogger(__name__)
+
 
 class i2c_pwm_PCA9685(MetaDriver):
+
+    pwm = None
 
     def __init__(self, device_config):
 
@@ -14,8 +19,10 @@ class i2c_pwm_PCA9685(MetaDriver):
         self.null_pos_on = device_config.get("null_pos_on", 0)
         self.null_pos_off = device_config.get("null_pos_off", 270)
 
-        self.pwm = Adafruit_PCA9685.PCA9685()
-        self.pwm.set_pwm_freq(50)
+        if not self.pwm:
+            self.pwm = Adafruit_PCA9685.PCA9685()
+            self.pwm.set_pwm_freq(device_config.get("pwm_freq", 50))
+            logger.info("PCA9685 initiated")
         self.pwm.set_pwm(self.dev_id, self.null_pos_on, self.null_pos_off)
 
     def set_device_double_value(self, value):
