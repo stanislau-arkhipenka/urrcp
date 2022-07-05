@@ -17,7 +17,7 @@ cd ${root_path}/thrift_files/
 
 # --------------------------------------- #
 echo "generating python sources"
-thrift --gen py urrcp.thrift
+thrift --gen py urrcp.thrift || exit 1
 # --------------------------------------- #
 
 echo "copy files"
