@@ -1,5 +1,5 @@
-import logging
 from __future__ import division
+import logging
 import Adafruit_PCA9685
 from device_handlers.meta_driver import MetaDriver
 
